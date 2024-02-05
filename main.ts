@@ -141,10 +141,10 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('Tiff Viewer Setting')
+			.setDesc('There are no settings for this plugin yet.')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
+				.setPlaceholder('Do what you want with this!')
 				.setValue(this.plugin.settings.mySetting)
 				.onChange(async (value) => {
 					this.plugin.settings.mySetting = value;
