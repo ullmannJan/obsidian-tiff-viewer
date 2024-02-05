@@ -1,6 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { convertTiffToPng } from './scripts/utils';
-import { ConverterModal } from './scripts/ConverterModal';
+import { ConverterModal } from './src/ConverterModal';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
