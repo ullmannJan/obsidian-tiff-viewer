@@ -85,7 +85,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'delete-tiff-png-editor',
-			name: 'Delete all .tif(f).png files editor',
+			name: 'Delete .tif(f).png files in editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -105,7 +105,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'convert-png-to-tiff',
-			name: 'Rename all .tif(f).png to .tif(f) in editor',
+			name: 'Rename .tif(f).png to .tif(f) in editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
