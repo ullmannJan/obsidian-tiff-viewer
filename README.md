@@ -6,9 +6,11 @@ This plugin creates copies of all `.tif(f)` files in the currently opened file a
 
 The plugin consists of 3 commands.
 
-- Convert .tif(f) to .png
+- `Tiff viewer: Convert .tif(f) to .png`
     - Creates a copy of all files in the current editor 
-- Delete all .tif(f).png in vault
-- Convert all .tif(f).png to .tif(f) in the editor
+- `Tiff viewer: Delete all .tif(f).png in vault`
+    - deletes all files in the vault, that end on **.tif(f).png**
+- `Tiff viewer: Convert all .tif(f).png to .tif(f) in the editor`
+    - Renames all **.tif(f).png** file links in the opened editor back to **.tif(f)**
 
 
