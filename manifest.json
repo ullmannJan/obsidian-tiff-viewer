@@ -1,5 +1,5 @@
 {
-	"id": "obsidian-tiff-viewer",
+	"id": "tiff-viewer",
 	"name": "Tiff viewer",
 	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
