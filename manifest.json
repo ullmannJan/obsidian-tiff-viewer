@@ -3,7 +3,7 @@
 	"name": "Tiff viewer",
 	"version": "1.0.4",
 	"minAppVersion": "0.15.0",
-	"description": "View .tif(f) files in Obsidian by generating duplicates in form of .png",
+	"description": "View .tif(f) files in Obsidian by generating duplicates in form of tif(f).png",
 	"author": "Jan Ullmann",
 	"isDesktopOnly": false
 }
