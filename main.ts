@@ -1,6 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { ConverterModal } from './src/ConverterModal';
 import { DeleteModal } from './src/DeleteModal';
+import { ConfirmationModal } from './src/ConfirmationModal';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -25,7 +26,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// add modal
 		this.addCommand({
 			id: 'convert-tiff-to-png-editor',
-			name: 'Convert .tif(f) to .png in editor',
+			name: 'Convert .tif(f) to tif(f).png in editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				
 				if (view && editor) {
@@ -51,17 +52,28 @@ export default class TiffViewerPlugin extends Plugin {
 					// If checking is true, we're simply "checking" if the command can be run.
 					// If checking is false, then we want to actually perform the operation.
 					if (!checking) {
+
+						// Raise confirmation window
+						const confirmModal = new ConfirmationModal(this.app, 
+							'Confirmation', 
+							'Are you sure you want to delete all .tif(f).png files in the vault?',
+							(confirmed: boolean) => {
+								if (confirmed) {
+									
+									const allFilesInVault = this.app.vault.getFiles();
+			
+									const tiffPngFiles = allFilesInVault.filter(file => {
+										return file.path.endsWith('.tif.png') || file.path.endsWith('.tiff.png');
+									});
+			
+									tiffPngFiles.forEach(file => {
+										this.app.vault.delete(file);
+									});
+								}
+							});
+
+						confirmModal.open();
 						
-						const allFilesInVault = this.app.vault.getFiles();
-
-						const tiffPngFiles = allFilesInVault.filter(file => {
-							return file.path.endsWith('.tif.png') || file.path.endsWith('.tiff.png');
-						});
-
-						tiffPngFiles.forEach(file => {
-							this.app.vault.delete(file);
-						});
-				
 					}
 
 					// This command will only show up in Command Palette when the check function returns true
