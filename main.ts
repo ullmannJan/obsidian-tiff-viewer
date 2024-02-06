@@ -23,8 +23,8 @@ export default class TiffViewerPlugin extends Plugin {
 
 		// add modal
 		this.addCommand({
-			id: 'convert-to-png',
-			name: 'Convert to png',
+			id: 'convert-tiff-to-png',
+			name: 'Convert .tif(f) to .png',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				
 				if (view && editor) {
@@ -42,7 +42,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'delete_tiff_png',
-			name: 'Delete all .tif.png and .tiff.png in vault',
+			name: 'Delete all .tif(f).png in vault',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -73,7 +73,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'convert_png_to_tiff',
-			name: 'Convert all .tiff.png/.tif.png to .tiff/.tif in the editor',
+			name: 'Convert all .tif(f).png to .tif(f) in the editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
