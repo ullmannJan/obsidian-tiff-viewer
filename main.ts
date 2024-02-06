@@ -1,5 +1,6 @@
 import { App, Editor, MarkdownView, Modal, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { ConverterModal } from './src/ConverterModal';
+import { DeleteModal } from './src/DeleteModal';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -23,8 +24,8 @@ export default class TiffViewerPlugin extends Plugin {
 
 		// add modal
 		this.addCommand({
-			id: 'convert-tiff-to-png',
-			name: 'Convert .tif(f) to .png',
+			id: 'convert-tiff-to-png-editor',
+			name: 'Convert .tif(f) to .png in editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				
 				if (view && editor) {
@@ -41,8 +42,8 @@ export default class TiffViewerPlugin extends Plugin {
 
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
-			id: 'delete_tiff_png',
-			name: 'Delete all .tif(f).png in vault',
+			id: 'delete-tiff-png-vault',
+			name: 'Delete all .tif(f).png files in vault',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -69,11 +70,30 @@ export default class TiffViewerPlugin extends Plugin {
 			}
 		});
 
-		
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
-			id: 'convert_png_to_tiff',
-			name: 'Convert all .tif(f).png to .tif(f) in the editor',
+			id: 'delete-tiff-png-editor',
+			name: 'Delete all .tif(f).png files editor',
+			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
+				// Conditions to check
+				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (markdownView) {
+					// If checking is true, we're simply "checking" if the command can be run.
+					// If checking is false, then we want to actually perform the operation.
+					if (!checking) {
+						new DeleteModal(this.app, editor).open();
+					}
+
+					// This command will only show up in Command Palette when the check function returns true
+					return true;
+				}
+			}
+		});
+
+		// This adds a complex command that can check whether the current state of the app allows execution of the command
+		this.addCommand({
+			id: 'convert-png-to-tiff',
+			name: 'Rename all .tif(f).png to .tif(f) in editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);

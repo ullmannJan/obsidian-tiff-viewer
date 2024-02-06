@@ -1,32 +1,36 @@
-import { App, Modal, Editor, TFile } from "obsidian";
+import { App, Editor } from "obsidian";
+import { SuperModal } from "./SuperModal";
 const UTIF = require('utif');
 const PNG = require('pngjs').PNG;
 
 
-export class ConverterModal extends Modal {
-    editor: Editor;
+export class ConverterModal extends SuperModal {
+    progressbar: HTMLProgressElement;
 
     constructor(app: App, editor: Editor) {
-        super(app);
-        this.editor = editor;
+        super(app, editor);
     }
 
     onOpen() {
-        const { contentEl } = this;
-        contentEl.createEl("h1", { text: "Converting Tiff to Png..." });
+        this.contentEl.createEl("h1", { text: "Converting Tiff to Png..." });
 
         // progress bar
-        const progressBar = this.createProgressBar(contentEl);
+        this.progressbar = this.createProgressBar(this.contentEl);
         
-        const editorContent = this.editor.getValue();
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) {
             console.error('No active file');
             return;
         }
         
+        this.convertTiffFilesToPng()
+
+    }
+
+    private convertTiffFilesToPng() {
+
         const tiffFileRegex = /!\[\[(.*\.tif{1,2})\]\]/gi;
-        const matches = editorContent.match(tiffFileRegex);
+        const matches = this.editor.getValue().match(tiffFileRegex);
         
         if (matches && matches.length > 0) {
             // The editor contains a .tiff file
@@ -38,10 +42,10 @@ export class ConverterModal extends Modal {
                 const tiffFilePath = tiffFile.replace(/\\/g, '/');
                 
                 return new Promise<void>((resolve, reject) => {
-                    this.convertTiffToPngWrapper(tiffFilePath)
+                    this.convertTiffToPng(tiffFilePath)
                         .then(() => {
                             console.log('Successfully converted', tiffFile);
-                            this.updateProgressBar(progressBar, this.getCurrentProgress(progressBar)+100/matches.length);
+                            this.updateProgressBar(this.progressbar, this.getCurrentProgress(this.progressbar)+100/matches.length);
                             resolve();
                         })
                         .catch(err => {
@@ -64,141 +68,50 @@ export class ConverterModal extends Modal {
                 
                     if (errors.length === 0) {
                         console.log('All conversions completed successfully');
-                        this.addSuccessBox(contentEl, "All conversions completed successfully");
+                        this.addSuccessBox(this.contentEl, "All conversions completed successfully");
                     } else {
                         console.error('Errors occurred during conversions:\n', errors.join('\n'));
-                        this.addErrorBox(contentEl, "Errors occurred during conversion:\n\t" +  errors.join('\n\t'));
+                        this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n\t" +  errors.join('\n\t'));
                     }
-                })
-
+                });
 
         }
-
     }
 
-    onClose() {
-        let { contentEl } = this;
-        contentEl.empty();
-    }   
-
-    private createProgressBar(contentEl: HTMLElement): HTMLProgressElement {
-
-        const progressBar = contentEl.createEl('progress');
-        progressBar.setAttribute('value', '0');
-        progressBar.setAttribute('max', '100');
-        progressBar.style.width = '100%';
-        progressBar.style.display = 'block';
-        progressBar.style.margin = '10px 0';
-        return progressBar;
-    }
-
-    private addErrorBox(contentEl: HTMLElement, errorMessage: string) {
-        let errorBox = contentEl.createEl('div');
-        errorBox.style.padding = '10px';
-        errorBox.style.whiteSpace = 'pre-wrap';
-        errorBox.style.marginTop = '10px';
-        errorBox.style.backgroundColor = '#f8d7da';
-        errorBox.style.color = '#721c24';
-        errorBox.style.border = '1px solid #f5c6cb';
-        errorBox.style.borderRadius = '4px';
-        errorBox.textContent = errorMessage;
-    }
-
-    private addSuccessBox(contentEl: HTMLElement, successMessage: string) {
-        let successBox = contentEl.createEl('div');
-        successBox.style.padding = '10px';
-        successBox.style.marginTop = '10px';
-        successBox.style.backgroundColor = '#d4edda';
-        successBox.style.color = '#155724';
-        successBox.style.border = '1px solid #c3e6cb';
-        successBox.style.borderRadius = '4px';
-        successBox.textContent = successMessage;
-    }
-
-    private getCurrentProgress(progressBar: HTMLProgressElement): number {
-        const progress = progressBar.getAttribute('value');
-        if (progress) {
-            return parseInt(progress);
-        }
-        return 0;
-    }
-
-    private updateProgressBar(progressBar: HTMLProgressElement, progress: number) {
-        //test if out of range
-        if (progress < 0) {
-            progress = 0;
-        }
-        if (progress > 100) {
-            progress = 100;
-        }
-        progressBar.setAttribute('value', progress.toString());
-    }
-
-    private async convertTiffToPngWrapper(tiffFilePath: string): Promise<void> {
+    private async convertTiffToPng(tiffFilePath: string): Promise<void> {
     
-        return new Promise<void>(async (resolve, reject) => {
-
-            console.log(`Converting ${tiffFilePath}`);
-
-            // find the file in the vault
-            const fileInVault = this.app.vault.getAbstractFileByPath(tiffFilePath);
-            let tiffFileInVault = null;
-            if (fileInVault instanceof TFile) {
-                tiffFileInVault = fileInVault;
-                console.log('tiffFilePath', tiffFileInVault);
-            } else {
-                // if file not found in vault, search for it
-                const allFilesInVault = this.app.vault.getFiles();
+        console.log(`Converting ${tiffFilePath}`);
+            
+        // find the file in the vault
+        const tiffFileInVault = await this.findFileInVault(tiffFilePath)
+        
+        // create png file path
+        let pngFilePath = tiffFileInVault.path + '.png';
+        
+        // read tiff file
+        const tiffFileData = await this.app.vault.adapter.readBinary(tiffFileInVault.path)
+        
+        // convert tiff to png
+        const pngFileData = await this.convertTiffDataToPng(tiffFileData)
+        
+        // create png file
+        this.createFile(pngFilePath, pngFileData);
+        
+        // rename in editor
+        const editorContent = this.editor.getValue();
+        const newEditorContent = editorContent.replace(tiffFilePath, pngFilePath);
+        this.editor.setValue(newEditorContent);
+        return;
                 
-                let foundFile = false;
-                for (const file of allFilesInVault) {
-                    if (file.name === tiffFilePath) {
-                        foundFile = true;
-                        tiffFileInVault = file;
-                        console.log('tiffFilePath found in search', tiffFileInVault);
-                        break;
-                    }
-                }
-                
-                if (!foundFile) {
-                    const err = new Error(`File not found in vault: ${tiffFilePath}`);
-                    reject(err);
-                }
-            }
-            // create png file
-            if (tiffFileInVault) {
-                let pngFilePath = tiffFileInVault.path + '.png';
 
-                const { vault } = this.app;
-                // get directory path of open note
-                
-                const { adapter } = vault;
-
-                const tiffFileData = await adapter.readBinary(tiffFileInVault.path)
-                // convert tiff to png
-                const pngFileData = await this.convertTiffToPng(tiffFileData);
-                
-                // create png file
-                this.createFile(pngFilePath, pngFileData);
-                
-                // rename in editor
-                const editorContent = this.editor.getValue();
-                const newEditorContent = editorContent.replace(tiffFilePath, pngFilePath);
-                this.editor.setValue(newEditorContent);
-
-            }
-            // everything went well
-            resolve();
-        });
     }
 
-    private async convertTiffToPng(tiffFileData: ArrayBuffer): Promise<ArrayBuffer> {
+    private async convertTiffDataToPng(tiffFileData: ArrayBuffer): Promise<ArrayBuffer> {
         // Convert the tiff file data to png
 
-        
-        let ifds = UTIF.decode(tiffFileData);
+        const ifds = await UTIF.decode(tiffFileData);
         UTIF.decodeImage(tiffFileData, ifds[0]);
-        let rgba = UTIF.toRGBA8(ifds[0]); 
+        const rgba = UTIF.toRGBA8(ifds[0]); 
 
         // Create a new PNG image and set its data
         let png = new PNG({
@@ -219,21 +132,9 @@ export class ConverterModal extends Modal {
         }
 
         // Write the PNG image to a buffer
-        let pngFileData = PNG.sync.write(png);
+        const pngFileData = PNG.sync.write(png);
 
         // const pngFileData = tiffFileData; // For now, we'll just simulate a conversion by returning the same data
         return pngFileData;
-    }
-
-
-    private async createFile(filePath: string, data: ArrayBuffer): Promise<void> {
-        const { vault } = this.app;
-        // get directory path of open note
-        
-        const { adapter } = vault;
-        const fileExists = await adapter.exists(filePath);
-        if (!fileExists) {
-          return adapter.writeBinary(filePath, data);
-        }
     }
 }
