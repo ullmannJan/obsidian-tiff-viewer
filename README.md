@@ -2,7 +2,7 @@
 
 This plugin creates copies of all `.tif(f)` files in the currently opened file and converts them to `.tif(f).png` where ever they are saved. This allows for `tif(f)` images to be displayed in obsidian. 
 
-# Use Case
+## Use Case
 
 In Science it is still common to use `.tif(f)` files. Today's browsers are not natively compatible with this picture format and thus, obsidian is not capable of displaying them. To address this issue this plugin allows to simplify the conversion process by running one command to convert the file links to `.tif(f).png` files. Furthermore, it creates a `.png` copy of this image in the same directory as source file. This picture can now be easily displayed in an obsidian note.
 
