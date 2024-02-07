@@ -121,7 +121,7 @@ export default class TiffViewerPlugin extends Plugin {
 							matches.forEach(match => {
 								
 								const editorContent = editor.getValue();
-								const newEditorContent = editorContent.replace(match, match.replace('.png', ''));
+								const newEditorContent = editorContent.replace(match, match.replace('.png]]', ']]'));
 								editor.setValue(newEditorContent);
 							});
 						}

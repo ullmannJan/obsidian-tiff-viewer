@@ -1,6 +1,6 @@
-import { App, Editor } from "obsidian";
+import { App, Editor, normalizePath } from "obsidian";
 import { SuperModal } from "./SuperModal";
-
+import { normalize } from "path";
 
 export class DeleteModal extends SuperModal {
     progressbar: HTMLProgressElement;
@@ -35,7 +35,7 @@ export class DeleteModal extends SuperModal {
             console.log('found .tiff.png files', matches);
             const conversionPromises = matches.map(match => {
                 const tiffPngFile = match.replace('![[', '').replace(']]', '');
-                const tiffPngFilePath = tiffPngFile.replace(/\\/g, '/');
+                const tiffPngFilePath = normalizePath(tiffPngFile);
                 
                 return new Promise<void>((resolve, reject) => {
                     this.deleteTiffPngFileInEditor(tiffPngFilePath)
@@ -77,6 +77,7 @@ export class DeleteModal extends SuperModal {
 
         // rename file in editor
         const editorContent = this.editor.getValue();
+        // remove .png from file name
         const newEditorContent = editorContent.replace(filePath, filePath.slice(0, -4));
         this.editor.setValue(newEditorContent);
         

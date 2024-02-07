@@ -1,4 +1,4 @@
-import { App, Editor } from "obsidian";
+import { App, Editor, normalizePath } from "obsidian";
 import { SuperModal } from "./SuperModal";
 const UTIF = require('utif');
 const PNG = require('pngjs').PNG;
@@ -39,7 +39,7 @@ export class ConverterModal extends SuperModal {
             console.log('found tiff files', matches);
             const conversionPromises = matches.map(match => {
                 const tiffFile = match.replace('![[', '').replace(']]', '');
-                const tiffFilePath = tiffFile.replace(/\\/g, '/');
+                const tiffFilePath = normalizePath(tiffFile);
                 
                 return new Promise<void>((resolve, reject) => {
                     this.convertTiffToPng(tiffFilePath)
