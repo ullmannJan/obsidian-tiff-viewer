@@ -10,13 +10,13 @@ In Science it is still common to use `.tif(f)` files. Today's browsers are not n
 
 The plugin consists of 4 commands.
 
-- `Tiff Viewer: Convert .tif(f) to .tif(f).png in editor`
+- `Tiff Viewer: Create .tif(f).png from .tif(f) in editor and rename links`
     - Creates a copy of all **.tif(f)** files that are linked in the current editor and converts them to **.tif(f).png** and renames the file links.
-- `Tiff Viewer: Delete all .tif(f).png files in vault`
+- `Tiff Viewer: Delete all .tif(f).png files in vault (dangerous)`
     - deletes all files in the vault, that end on **.tif(f).png**.
-- `Tiff Viewer: Delete .tif(f).png files in editor`
+- `Tiff Viewer: Delete .tif(f).png files linked in editor and rename links`
     - renames file links in the editor from **.tif(f).png** to **.tif(f)**. Then, it deletes the corresponding **.tif(f).png** files.
-- `Tiff Viewer: Rename .tif(f).png to .tif(f) in editor`
+- `Tiff Viewer: Rename file links with .tif(f).png to .tif(f) in editor`
     - Renames all **.tif(f).png** file links in the current editor back to **.tif(f)**. However, it does not delete anything.
 
 
