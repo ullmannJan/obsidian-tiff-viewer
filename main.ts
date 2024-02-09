@@ -17,7 +17,7 @@ export default class TiffViewerPlugin extends Plugin {
 	 * Called when the plugin is loaded.
 	 */
 	async onload() {
-		console.log('loading plugin')
+		console.log('loading tiff-viewer-plugin')
 
 		// Add command to convert TIFF to PNG in editor and rename links
 		this.addCommand({
@@ -107,14 +107,9 @@ export default class TiffViewerPlugin extends Plugin {
 			}
 		});
 
-		// Register interval
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
-	/**
-	 * Called when the plugin is unloaded.
-	 */
 	async onunload() {
-		console.log('unloading plugin')
+		console.log('unloading tiff-viewer-plugin')
 	}
 }

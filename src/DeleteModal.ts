@@ -1,6 +1,5 @@
 import { App, Editor, normalizePath } from "obsidian";
 import { SuperModal } from "./SuperModal";
-import { normalize } from "path";
 
 export class DeleteModal extends SuperModal {
     progressbar: HTMLProgressElement;
@@ -37,8 +36,7 @@ export class DeleteModal extends SuperModal {
         }
 
         if (matches && matches.length > 0) {
-            // The editor contains a .tiff file
-            // Perform your operation here
+            // The editor contains a .tif(f).png file
 
             console.log('found .tiff.png files', matches, "in lines", lineIndices);
             const conversionPromises = matches.map(async (match, index) => {
@@ -100,6 +98,5 @@ export class DeleteModal extends SuperModal {
         // delete file
         console.log('deleting', filePath);
         await this.deleteFile(filePath);
-        return;
     } 
 }

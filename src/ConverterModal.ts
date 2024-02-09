@@ -41,10 +41,8 @@ export class ConverterModal extends SuperModal {
         }
         
         if (matches && matches.length > 0) {
-            // The editor contains a .tiff file
-            // Perform your operation here
+            // The editor contains a .tif(f) file
             
-
             console.log('found tiff files', matches, "in lines", lineIndices);
             const conversionPromises = matches.map(async (match, index) => {
                 const tiffFile = match.replace('![[', '').replace(']]', '');
