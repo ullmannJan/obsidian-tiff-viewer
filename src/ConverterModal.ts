@@ -29,29 +29,43 @@ export class ConverterModal extends SuperModal {
 
     private convertTiffFilesToPng() {
 
-        const tiffFileRegex = /!\[\[(.*\.tif{1,2})\]\]/gi;
-        const matches = this.editor.getValue().match(tiffFileRegex);
+        const tiffFileRegex = /!\[\[(.*?\.tif{1,2})\]\]/gi;
+        let match;
+        let matches: string[] = [];
+        let lineIndices: number[] = [];
+        let editorValue = this.editor.getValue();
+        while ((match = tiffFileRegex.exec(editorValue)) !== null) {
+            matches.push(match[0]);
+            let lineNumber = (editorValue.substring(0, match.index).match(/\n/g) || []).length;
+            lineIndices.push(lineNumber);
+        }
         
         if (matches && matches.length > 0) {
             // The editor contains a .tiff file
             // Perform your operation here
+            
 
-            console.log('found tiff files', matches);
-            const conversionPromises = matches.map(match => {
+            console.log('found tiff files', matches, "in lines", lineIndices);
+            const conversionPromises = matches.map(async (match, index) => {
                 const tiffFile = match.replace('![[', '').replace(']]', '');
                 const tiffFilePath = normalizePath(tiffFile);
+                const line = lineIndices[index]; 
                 
-                return new Promise<void>((resolve, reject) => {
-                    this.convertTiffToPng(tiffFilePath)
+                return await new Promise<void>((resolve, reject) => {
+                    this.convertTiffToPng(tiffFilePath, line)
                         .then(() => {
                             console.log('Successfully converted', tiffFile);
-                            this.updateProgressBar(this.progressbar, this.getCurrentProgress(this.progressbar)+100/matches.length);
                             resolve();
                         })
                         .catch(err => {
                             console.error(`Failed to convert ${tiffFile}`);
                             const error = new Error(`\n\tFailed to convert ${tiffFile}:\n\t -> ${err.message}`);
                             reject(error);
+                        })
+                        .finally(() => {
+                            const progress = Math.ceil(this.getCurrentProgress(this.progressbar)+100/matches.length);
+                            this.updateProgressBar(this.progressbar, progress);
+                            resolve();
                         });
 
                 });
@@ -75,10 +89,13 @@ export class ConverterModal extends SuperModal {
                     }
                 });
 
+        }else {
+             this.progressbar.setAttribute('value', '100');
+             this.addErrorBox(this.contentEl, "No .tif(f).png files found in editor");
         }
     }
 
-    private async convertTiffToPng(tiffFilePath: string): Promise<void> {
+    private async convertTiffToPng(tiffFilePath: string, line: number): Promise<void> {
     
         console.log(`Converting ${tiffFilePath}`);
             
@@ -97,13 +114,10 @@ export class ConverterModal extends SuperModal {
         // create png file
         this.createFile(pngFilePath, pngFileData);
         
-        // rename in editor
-        const editorContent = this.editor.getValue();
-        const newEditorContent = editorContent.replace(tiffFilePath, pngFilePath);
-        this.editor.setValue(newEditorContent);
-        return;
-                
-
+        // rename file link in editor
+        const lineContent = this.editor.getLine(line);
+        this.editor.setLine(line, lineContent.replace(tiffFilePath+"]]", pngFilePath+"]]"));
+        
     }
 
     private async convertTiffDataToPng(tiffFileData: ArrayBuffer): Promise<ArrayBuffer> {

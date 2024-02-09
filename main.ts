@@ -40,7 +40,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'delete-tiff-png-vault',
-			name: 'Delete all .tif(f).png files in vault (dangerous)',
+			name: 'Debug: Delete all .tif(f).png files in vault (dangerous)',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -101,7 +101,7 @@ export default class TiffViewerPlugin extends Plugin {
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'convert-png-to-tiff',
-			name: 'Rename file links with .tif(f).png to .tif(f) in editor',
+			name: 'Debug: Rename file links with .tif(f).png to .tif(f) in editor',
 			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
