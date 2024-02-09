@@ -57,7 +57,7 @@ export class ConverterModal extends SuperModal {
                         })
                         .catch(err => {
                             console.error(`Failed to convert ${tiffFile}`);
-                            const error = new Error(`\n\tFailed to convert ${tiffFile}:\n\t -> ${err.message}`);
+                            const error = new Error(`Failed to convert ${tiffFile} :\n -> ${err.message}`);
                             reject(error);
                         })
                         .finally(() => {
@@ -74,7 +74,7 @@ export class ConverterModal extends SuperModal {
                     let errors: Array<String> = [];
                     results.forEach((result, i) => {
                         if (result.status === 'rejected') {
-                            errors.push(`Conversion ${i + 1}: ${result.reason.message}`);
+                            errors.push(`\nConversion ${i + 1}: ${result.reason.message}`);
                         }
                     });
                 
@@ -83,7 +83,7 @@ export class ConverterModal extends SuperModal {
                         this.addSuccessBox(this.contentEl, "All conversions completed successfully");
                     } else {
                         console.error('Errors occurred during conversions:\n', errors.join('\n'));
-                        this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n\t" +  errors.join('\n\t'));
+                        this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n" +  errors.join('\n'));
                     }
                 });
 

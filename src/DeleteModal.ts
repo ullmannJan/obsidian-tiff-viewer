@@ -52,7 +52,7 @@ export class DeleteModal extends SuperModal {
                         })
                         .catch(err => {
                             console.error(`Failed to convert and delete ${tiffPngFile}`);
-                            const error = new Error(`\n\tFailed to convert ${tiffPngFile}:\n\t -> ${err.message}`);
+                            const error = new Error(`Failed to convert ${tiffPngFile} :\n -> ${err.message}`);
                             reject(error);
                         })
                         .finally(() => {
@@ -69,7 +69,7 @@ export class DeleteModal extends SuperModal {
                     let errors: Array<String> = [];
                     results.forEach((result, i) => {
                         if (result.status === 'rejected') {
-                            errors.push(`Conversion ${i + 1}: ${result.reason.message}`);
+                            errors.push(`\nConversion ${i + 1}: ${result.reason.message}`);
                         }
                     });
                 
@@ -78,7 +78,7 @@ export class DeleteModal extends SuperModal {
                         this.addSuccessBox(this.contentEl, "All conversions completed successfully");
                     } else {
                         console.error('Errors occurred during conversions:\n', errors.join('\n'));
-                        this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n\t" +  errors.join('\n\t'));
+                        this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n" +  errors.join('\n'));
                     }
                 });
            } else {
@@ -95,8 +95,9 @@ export class DeleteModal extends SuperModal {
         const lineContent = this.editor.getLine(line);
         this.editor.setLine(line, lineContent.replace(filePath+"]]", filePath.slice(0,-4)+"]]"));
         
-        // delete file
+        // delete file from vault
         console.log('deleting', filePath);
         await this.deleteFile(filePath);
+       
     } 
 }
