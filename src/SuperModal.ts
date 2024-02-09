@@ -101,7 +101,7 @@ export class SuperModal extends Modal {
         }
     }
 
-    protected async deleteFile(filePath: string) {
+    protected async deleteFile(filePath: string): Promise<void>{
             
         const file = await this.findFileInVault(filePath);
         if (file instanceof TFile) {

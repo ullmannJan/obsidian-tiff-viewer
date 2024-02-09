@@ -90,15 +90,16 @@ export class DeleteModal extends SuperModal {
         }
 
     private async deleteTiffPngFileInEditor(filePath: string, line: number): Promise<void> {
-
         // filePath is something/like/this/file.tif.png
-        // rename file in editor
+
         // remove .png from file name
+        // rename file in editor
         const lineContent = this.editor.getLine(line);
         this.editor.setLine(line, lineContent.replace(filePath+"]]", filePath.slice(0,-4)+"]]"));
         
         // delete file
+        console.log('deleting', filePath);
         await this.deleteFile(filePath);
-        
+        return;
     } 
 }
