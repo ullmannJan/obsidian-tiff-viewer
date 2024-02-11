@@ -12,7 +12,7 @@ export class ConverterModal extends SuperModal {
     }
 
     onOpen() {
-        this.contentEl.createEl("h1", { text: "Converting Tiff to Png..." });
+        this.contentEl.createEl("h1", { text: "Converting .tiff to .tiff.png" });
 
         // progress bar
         this.progressbar = this.createProgressBar(this.contentEl);
@@ -43,7 +43,7 @@ export class ConverterModal extends SuperModal {
         if (matches && matches.length > 0) {
             // The editor contains a .tif(f) file
             
-            console.log('found tiff files', matches, "in lines", lineIndices);
+            // console.log('found tiff files', matches, "in lines", lineIndices);
             const conversionPromises = matches.map(async (match, index) => {
                 const tiffFile = match.replace('![[', '').replace(']]', '');
                 const tiffFilePath = normalizePath(tiffFile);
@@ -52,11 +52,11 @@ export class ConverterModal extends SuperModal {
                 return await new Promise<void>((resolve, reject) => {
                     this.convertTiffToPng(tiffFilePath, line)
                         .then(() => {
-                            console.log('Successfully converted', tiffFile);
+                            // console.log('Successfully converted', tiffFile);
                             resolve();
                         })
                         .catch(err => {
-                            console.error(`Failed to convert ${tiffFile}`);
+                            // console.error(`Failed to convert ${tiffFile}, ${err.message}`);
                             const error = new Error(`Failed to convert ${tiffFile} :\n -> ${err.message}`);
                             reject(error);
                         })
@@ -79,10 +79,9 @@ export class ConverterModal extends SuperModal {
                     });
                 
                     if (errors.length === 0) {
-                        console.log('All conversions completed successfully');
                         this.addSuccessBox(this.contentEl, "All conversions completed successfully");
                     } else {
-                        console.error('Errors occurred during conversions:\n', errors.join('\n'));
+                        // console.error('Errors occurred during conversions:\n', errors.join('\n'));
                         this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n" +  errors.join('\n'));
                     }
                 });
@@ -94,9 +93,7 @@ export class ConverterModal extends SuperModal {
     }
 
     private async convertTiffToPng(tiffFilePath: string, line: number): Promise<void> {
-    
-        console.log(`Converting ${tiffFilePath}`);
-            
+                
         // find the file in the vault
         const tiffFileInVault = await this.findFileInVault(tiffFilePath)
         

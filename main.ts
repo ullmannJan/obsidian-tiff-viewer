@@ -6,18 +6,18 @@ import { ConverterModal } from './src/ConverterModal';
 import { DeleteModal } from './src/DeleteModal';
 import { ConfirmationModal } from './src/ConfirmationModal';
 
-interface MyPluginSettings {
+interface TiffViewerSettings {
 	mySetting: string;
 }
 
 export default class TiffViewerPlugin extends Plugin {
-	settings: MyPluginSettings;
+	settings: TiffViewerSettings;
 
 	/**
 	 * Called when the plugin is loaded.
 	 */
 	async onload() {
-		console.log('loading tiff-viewer-plugin')
+		// console.log('loading tiff-viewer-plugin')
 
 		// Add command to convert TIFF to PNG in editor and rename links
 		this.addCommand({
@@ -91,14 +91,23 @@ export default class TiffViewerPlugin extends Plugin {
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (markdownView) {
 					if (!checking) {
-						const tiffPngRegex = /!\[\[(.*\.tif{1,2}\.png)\]\]/gi;
-						const matches = editor.getValue().match(tiffPngRegex);
+						
+						const tiffPngRegex = /!\[\[(.*?\.tif{1,2}\.png)\]\]/gi;
+						let match;
+						let matches: string[] = [];
+						let lineIndices: number[] = [];
+						let editorValue = editor.getValue();
+						while ((match = tiffPngRegex.exec(editorValue)) !== null) {
+							matches.push(match[0]);
+							let lineNumber = (editorValue.substring(0, match.index).match(/\n/g) || []).length;
+							lineIndices.push(lineNumber);
+						}
 						if (matches && matches.length > 0) {
-							console.log('matches', matches);
-							matches.forEach(match => {
-								const editorContent = editor.getValue();
-								const newEditorContent = editorContent.replace(match, match.replace('.png]]', ']]'));
-								editor.setValue(newEditorContent);
+							// console.log('matches', matches, "in lines", lineIndices);
+							matches.forEach((match, i) => {
+								const lineContent = editor.getLine(lineIndices[i]);
+								const newLineContent = lineContent.replace(match, match.replace('.png]]', ']]'));
+								editor.setLine(lineIndices[i], newLineContent);
 							});
 						}
 					}
@@ -110,6 +119,6 @@ export default class TiffViewerPlugin extends Plugin {
 	}
 
 	async onunload() {
-		console.log('unloading tiff-viewer-plugin')
+		// console.log('unloading tiff-viewer-plugin')
 	}
 }

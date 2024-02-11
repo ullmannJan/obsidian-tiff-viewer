@@ -19,32 +19,19 @@ export class SuperModal extends Modal {
         const progressBar = contentEl.createEl('progress');
         progressBar.setAttribute('value', '0');
         progressBar.setAttribute('max', '100');
-        progressBar.style.width = '100%';
-        progressBar.style.display = 'block';
-        progressBar.style.margin = '10px 0';
+        progressBar.classList.add('tiff-viewer-progress-bar');
         return progressBar;
     }
 
     protected addErrorBox(contentEl: HTMLElement, errorMessage: string) {
         let errorBox = contentEl.createEl('div');
-        errorBox.style.padding = '10px';
-        errorBox.style.whiteSpace = 'pre-wrap';
-        errorBox.style.marginTop = '10px';
-        errorBox.style.backgroundColor = '#f8d7da';
-        errorBox.style.color = '#721c24';
-        errorBox.style.border = '1px solid #f5c6cb';
-        errorBox.style.borderRadius = '4px';
+        errorBox.classList.add('tiff-viewer-error-box');
         errorBox.textContent = errorMessage;
     }
 
     protected addSuccessBox(contentEl: HTMLElement, successMessage: string) {
         let successBox = contentEl.createEl('div');
-        successBox.style.padding = '10px';
-        successBox.style.marginTop = '10px';
-        successBox.style.backgroundColor = '#d4edda';
-        successBox.style.color = '#155724';
-        successBox.style.border = '1px solid #c3e6cb';
-        successBox.style.borderRadius = '4px';
+        successBox.classList.add('tiff-viewer-success-box');
         successBox.textContent = successMessage;
     }
 
@@ -72,7 +59,7 @@ export class SuperModal extends Modal {
         return new Promise((resolve, reject) => {
             const fileInVault = this.app.vault.getAbstractFileByPath(tiffFilePath);
             if (fileInVault instanceof TFile) {
-                console.log('tiffFilePath', fileInVault)
+                // console.log('tiffFilePath', fileInVault)
                 resolve(fileInVault);
             } else {
                 // if file not found in vault, search for it in all Files
@@ -80,7 +67,7 @@ export class SuperModal extends Modal {
                 
                 for (const file of allFilesInVault) {
                     if (file.name === tiffFilePath) {
-                        console.log('tiffFilePath found in search', file);
+                        // console.log('tiffFilePath found in search', file);
                         resolve(file);
                     }
                 } 

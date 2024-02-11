@@ -9,7 +9,7 @@ export class DeleteModal extends SuperModal {
     }
 
     onOpen() {
-        this.contentEl.createEl("h1", { text: "Deleting tif(f).png" });
+        this.contentEl.createEl("h1", { text: "Deleting .tif(f).png" });
 
         // progress bar
         this.progressbar = this.createProgressBar(this.contentEl);
@@ -38,7 +38,7 @@ export class DeleteModal extends SuperModal {
         if (matches && matches.length > 0) {
             // The editor contains a .tif(f).png file
 
-            console.log('found .tiff.png files', matches, "in lines", lineIndices);
+            // console.log('found .tiff.png files', matches, "in lines", lineIndices);
             const conversionPromises = matches.map(async (match, index) => {
                 const tiffPngFile = match.replace('![[', '').replace(']]', '');
                 const tiffPngFilePath = normalizePath(tiffPngFile);
@@ -47,11 +47,11 @@ export class DeleteModal extends SuperModal {
                 return await new Promise<void>((resolve, reject) => {
                     this.deleteTiffPngFileInEditor(tiffPngFilePath, line)
                         .then(() => {
-                            console.log('Successfully converted and deleted', tiffPngFile);
+                            // console.log('Successfully converted and deleted', tiffPngFile);
                             resolve();
                         })
                         .catch(err => {
-                            console.error(`Failed to convert and delete ${tiffPngFile}`);
+                            // console.error(`Failed to convert and delete ${tiffPngFile}`);
                             const error = new Error(`Failed to convert ${tiffPngFile} :\n -> ${err.message}`);
                             reject(error);
                         })
@@ -74,10 +74,10 @@ export class DeleteModal extends SuperModal {
                     });
                 
                     if (errors.length === 0) {
-                        console.log('All conversions completed successfully');
+                        // console.log('All conversions completed successfully');
                         this.addSuccessBox(this.contentEl, "All conversions completed successfully");
                     } else {
-                        console.error('Errors occurred during conversions:\n', errors.join('\n'));
+                        // console.error('Errors occurred during conversions:\n', errors.join('\n'));
                         this.addErrorBox(this.contentEl, "Errors occurred during conversion:\n" +  errors.join('\n'));
                     }
                 });
@@ -96,7 +96,7 @@ export class DeleteModal extends SuperModal {
         this.editor.setLine(line, lineContent.replace(filePath+"]]", filePath.slice(0,-4)+"]]"));
         
         // delete file from vault
-        console.log('deleting', filePath);
+        // console.log('deleting', filePath);
         await this.deleteFile(filePath);
        
     } 

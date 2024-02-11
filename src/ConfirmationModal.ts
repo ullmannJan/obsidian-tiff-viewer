@@ -31,7 +31,9 @@ export class ConfirmationModal extends Modal {
             // Handle yes click
             this.handleButtonClick('yes');
         });
-        this.yesButton.style.marginRight = '10px'; // add some space between the buttons
+        // Create an invisible element with a certain width
+        const spacer = buttonGroup.createEl('div');
+        spacer.classList.add('tiff-viewer-confirmation-spacer');
 
         this.noButton = buttonGroup.createEl('button', { text: 'No', attr: { 'role': 'radio', 'aria-checked': 'false' } });
         this.noButton.addEventListener('click', () => {
@@ -49,7 +51,6 @@ export class ConfirmationModal extends Modal {
     onClose() {
         let { contentEl } = this;
         contentEl.empty();
-        console.log('confirmed', this.confirmed);
     }
 
     handleKeyDown(event: KeyboardEvent) {
@@ -67,6 +68,7 @@ export class ConfirmationModal extends Modal {
                 this.noButton.setAttribute('aria-checked', 'false');
                 break;
             case 'Enter':
+                event.preventDefault(); // Prevent the default action
                 if (document.activeElement === this.yesButton) {
                     this.handleButtonClick('yes');
                 } else if (document.activeElement === this.noButton) {
