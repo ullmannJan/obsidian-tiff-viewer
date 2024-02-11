@@ -8,6 +8,8 @@ In science it is still common to use `.tif(f)` files. Today's browsers are not n
 
 ## Functionality
 
+![obsidian-tiff-viewer-demo](https://github.com/ullmannJan/obsidian-tiff-viewer/assets/102742052/1a1491ba-2150-4b25-a449-cdef2768b0b3)
+
 The plugin consists of 4 commands.
 
 - `Tiff Viewer: Create .tif(f).png from .tif(f) in editor and rename links`
