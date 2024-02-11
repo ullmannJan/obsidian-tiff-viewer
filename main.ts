@@ -35,6 +35,22 @@ export default class TiffViewerPlugin extends Plugin {
 			},
 		});
 
+		// Add command to delete .tif(f).png files linked in editor and rename links
+		this.addCommand({
+			id: 'delete-tiff-png-editor',
+			name: 'Delete .tif(f).png files linked in editor and rename links',
+			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
+				// Check if markdown view is available
+				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (markdownView) {
+					if (!checking) {
+						new DeleteModal(this.app, editor).open();
+					}
+					return true;
+				}
+			}
+		});
+
 		// Add command to delete all .tif(f).png files in vault
 		this.addCommand({
 			id: 'delete-tiff-png-vault',
@@ -60,22 +76,6 @@ export default class TiffViewerPlugin extends Plugin {
 								}
 							});
 						confirmModal.open();
-					}
-					return true;
-				}
-			}
-		});
-
-		// Add command to delete .tif(f).png files linked in editor and rename links
-		this.addCommand({
-			id: 'delete-tiff-png-editor',
-			name: 'Delete .tif(f).png files linked in editor and rename links',
-			editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
-				// Check if markdown view is available
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					if (!checking) {
-						new DeleteModal(this.app, editor).open();
 					}
 					return true;
 				}
