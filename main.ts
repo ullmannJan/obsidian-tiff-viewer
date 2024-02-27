@@ -1,13 +1,18 @@
 /**
  * Plugin for viewing and manipulating TIFF files in Obsidian.
  */
-import { Editor, MarkdownView, Plugin } from 'obsidian';
+import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
 import { ConverterModal } from './src/ConverterModal';
 import { DeleteModal } from './src/DeleteModal';
 import { ConfirmationModal } from './src/ConfirmationModal';
 
 interface TiffViewerSettings {
-	mySetting: string;
+	automaticConversion: boolean;
+}
+
+
+const DEFAULT_SETTINGS: TiffViewerSettings = {
+	automaticConversion: false
 }
 
 export default class TiffViewerPlugin extends Plugin {
@@ -17,6 +22,7 @@ export default class TiffViewerPlugin extends Plugin {
 	 * Called when the plugin is loaded.
 	 */
 	async onload() {
+		await this.loadSettings();
 		// console.log('loading tiff-viewer-plugin')
 
 		// Add command to convert TIFF to PNG in editor and rename links
@@ -61,8 +67,8 @@ export default class TiffViewerPlugin extends Plugin {
 				if (markdownView) {
 					if (!checking) {
 						// Raise confirmation window
-						const confirmModal = new ConfirmationModal(this.app, 
-							'Confirmation', 
+						const confirmModal = new ConfirmationModal(this.app,
+							'Confirmation',
 							'Are you sure you want to delete all .tif(f).png files in the vault?',
 							(confirmed: boolean) => {
 								if (confirmed) {
@@ -91,7 +97,7 @@ export default class TiffViewerPlugin extends Plugin {
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (markdownView) {
 					if (!checking) {
-						
+
 						const tiffPngRegex = /!\[\[(.*?\.tif{1,2}\.png)\]\]/gi;
 						let match;
 						let matches: string[] = [];
@@ -116,9 +122,62 @@ export default class TiffViewerPlugin extends Plugin {
 			}
 		});
 
+		// This adds a settings tab so the user can configure various aspects of the plugin
+		this.addSettingTab(new TiffSettingTab(this.app, this));
+
+		// Add event listener for active leaf change
+		this.registerEvent(
+			this.app.workspace.on('active-leaf-change', async () => {
+				const activeFile = this.app.workspace.getActiveFile();
+				if (activeFile instanceof TFile
+					&& this.settings.automaticConversion
+					&& activeFile.extension === 'md') {
+
+					const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+					if (activeView) {
+						const editor = activeView.editor;
+						new ConverterModal(this.app, editor, true).open();
+					}
+				}
+			})
+		);
 	}
+
 
 	async onunload() {
 		// console.log('unloading tiff-viewer-plugin')
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+}
+
+class TiffSettingTab extends PluginSettingTab {
+	plugin: TiffViewerPlugin;
+
+	constructor(app: App, plugin: TiffViewerPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const { containerEl } = this;
+
+		containerEl.empty();
+
+		new Setting(containerEl)
+			.setName('Automatic conversion to PNG')
+			.setDesc('Convert all TIFF files to PNG automatically when opening a note')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.automaticConversion)
+				.onChange(async (value) => {
+					this.plugin.settings.automaticConversion = value;
+					await this.plugin.saveSettings();
+				}));
 	}
 }
