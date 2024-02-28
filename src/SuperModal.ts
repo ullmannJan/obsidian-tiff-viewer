@@ -57,24 +57,23 @@ export class SuperModal extends Modal {
     protected findFileInVault(tiffFilePath: string): Promise<TFile>{
 
         return new Promise((resolve, reject) => {
-            const fileInVault = this.app.vault.getAbstractFileByPath(tiffFilePath);
-            if (fileInVault instanceof TFile) {
-                // console.log('tiffFilePath', fileInVault)
-                resolve(fileInVault);
-            } else {
-                // if file not found in vault, search for it in all Files
-                const allFilesInVault = this.app.vault.getFiles();
-                
-                for (const file of allFilesInVault) {
-                    if (file.name === tiffFilePath) {
-                        // console.log('tiffFilePath found in search', file);
-                        resolve(file);
-                    }
-                } 
-                const err = new Error(`File not found in vault: ${tiffFilePath}`);
-                reject(err)
+            const activeFile = this.app.workspace.getActiveFile();
+            if (activeFile === null) {
+              const err = new Error('No active file');
+              reject(err);
             }
-        });
+            else{
+
+                const fileInVault = this.app.metadataCache.getFirstLinkpathDest(tiffFilePath, activeFile.path);
+                
+                if (fileInVault instanceof TFile) {
+                    resolve(fileInVault);
+                } else {
+                    const err = new Error(`File not found in vault: ${tiffFilePath}`);
+                    reject(err);
+                }
+            }
+          });
     }
 
     protected async createFile(filePath: string, data: ArrayBuffer): Promise<void> {
