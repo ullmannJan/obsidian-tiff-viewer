@@ -25,7 +25,7 @@ Furthermore, one can convert single tif(f)-files in the file-explorer by right-c
 
 ## Settings
 
-There is not a lot to configure in the moment.
+There is not a lot to configure at the moment.
 One can choose to run the conversion process  automatically on each file one opens.
 
 
