@@ -1,10 +1,11 @@
 /**
  * Plugin for viewing and manipulating TIFF files in Obsidian.
  */
-import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
+import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting, TFile, WorkspaceLeaf } from 'obsidian';
 import { ConverterModal } from './src/ConverterModal';
 import { DeleteModal } from './src/DeleteModal';
 import { ConfirmationModal } from './src/ConfirmationModal';
+import { convertTiffDataToPng } from './src/Conversion';
 
 interface TiffViewerSettings {
 	automaticConversion: boolean;
@@ -141,6 +142,43 @@ export default class TiffViewerPlugin extends Plugin {
 				}
 			})
 		);
+
+		// add command to convert to png by hand
+		this.registerEvent(
+			this.app.workspace.on('file-menu', (menu, file: TFile, source: string, leaf: WorkspaceLeaf) => {
+				if (file.extension === 'tiff' || file.extension === 'tif') {
+					menu.addItem((item) => {
+						item.setTitle('Create PNG Copy')
+							.setIcon('your-icon')
+							.onClick(async () => {
+
+								// pngPath = file.path + '.png';
+								const pngFilePath = file.path + '.png';
+
+								// read tiff file
+								const tiffFileData = await this.app.vault.adapter.readBinary(file.path);
+								// convert tiff to png
+								const pngFileData = await convertTiffDataToPng(tiffFileData);
+								// create png file
+								const fileExists = await this.app.vault.adapter.exists(pngFilePath);
+								if (fileExists) {
+									const confirmModal = new ConfirmationModal(this.app,
+										'Confirmation',
+										`Do you want to overwrite "${pngFilePath}"?`,
+										(confirmed: boolean) => {
+											if (confirmed) {
+												ConverterModal.createFile(pngFilePath, pngFileData, this.app, true);
+											}
+										});
+									confirmModal.open();
+								} else {
+									ConverterModal.createFile(pngFilePath, pngFileData, this.app);
+								}
+							});
+					});
+				}
+			})
+		);
 	}
 
 
@@ -172,7 +210,7 @@ class TiffSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Automatic conversion to PNG')
-			.setDesc('Convert all TIFF files to PNG automatically when opening a note')
+			.setDesc("Convert all TIFF files to PNG automatically when opening a note or when drag'n'dropping a tiff file into the editor.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.automaticConversion)
 				.onChange(async (value) => {

@@ -76,18 +76,18 @@ export class SuperModal extends Modal {
           });
     }
 
-    protected async createFile(filePath: string, data: ArrayBuffer): Promise<void> {
-        const { vault } = this.app;
+    static async createFile(filePath: string, data: ArrayBuffer, app: App, overwrite: Boolean = false): Promise<void> {
+        const { vault } = app;
         // get directory path of open note
         
         const { adapter } = vault;
         const fileExists = await adapter.exists(filePath);
-        if (!fileExists) {
+        if (!fileExists || overwrite) {
           return adapter.writeBinary(filePath, data);
         }
     }
 
-    protected async deleteFile(filePath: string): Promise<void>{
+    async deleteFile(filePath: string): Promise<void>{
             
         const file = await this.findFileInVault(filePath);
         if (file instanceof TFile) {
