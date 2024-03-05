@@ -28,6 +28,7 @@ Furthermore, one can convert single tif(f)-files in the file-explorer by right-c
 There is not a lot to configure at the moment.
 One can choose to run the conversion process  automatically on each file one opens.
 
+![image](https://github.com/ullmannJan/obsidian-tiff-viewer/assets/102742052/22a3af83-f967-497d-80bb-d97cef012717)
 
 ## Development
 
