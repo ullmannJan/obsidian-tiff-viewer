@@ -21,6 +21,14 @@ The plugin consists of 4 commands.
 - `Tiff Viewer: Debug: Rename file links with .tif(f).png to .tif(f) in editor`
     - Renames all **.tif(f).png** file links in the current editor back to **.tif(f)**. However, it does not delete anything.
 
+Furthermore, one can convert single tif(f)-files in the file-explorer by right-clicking on them and selecting `Create PNG Copy`.
+
+## Settings
+
+There is not a lot to configure in the moment.
+One can choose to run the conversion process  automatically on each file one opens.
+
+
 ## Development
 
 To compile the project, you can use the following steps:
