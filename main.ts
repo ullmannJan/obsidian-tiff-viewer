@@ -1,11 +1,11 @@
 /**
  * Plugin for viewing and manipulating TIFF files in Obsidian.
  */
-import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting, TFile, WorkspaceLeaf } from 'obsidian';
+import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Menu, Setting, TFile, WorkspaceLeaf } from 'obsidian';
 import { ConverterModal } from './src/ConverterModal';
 import { DeleteModal } from './src/DeleteModal';
 import { ConfirmationModal } from './src/ConfirmationModal';
-import { convertTiffDataToPng } from './src/Conversion';
+import { convertTiffToPng, replaceTiffLink } from './src/Conversion';
 
 interface TiffViewerSettings {
 	automaticConversion: boolean;
@@ -149,36 +149,47 @@ export default class TiffViewerPlugin extends Plugin {
 				if (file.extension === 'tiff' || file.extension === 'tif') {
 					menu.addItem((item) => {
 						item.setTitle('Create PNG Copy')
-							.setIcon('your-icon')
+							.setIcon('cog')
 							.onClick(async () => {
-
-								// pngPath = file.path + '.png';
-								const pngFilePath = file.path + '.png';
-
-								// read tiff file
-								const tiffFileData = await this.app.vault.adapter.readBinary(file.path);
-								// convert tiff to png
-								const pngFileData = await convertTiffDataToPng(tiffFileData);
-								// create png file
-								const fileExists = await this.app.vault.adapter.exists(pngFilePath);
-								if (fileExists) {
-									const confirmModal = new ConfirmationModal(this.app,
-										'Confirmation',
-										`Do you want to overwrite "${pngFilePath}"?`,
-										(confirmed: boolean) => {
-											if (confirmed) {
-												ConverterModal.createFile(pngFilePath, pngFileData, this.app, true);
-											}
-										});
-									confirmModal.open();
-								} else {
-									ConverterModal.createFile(pngFilePath, pngFileData, this.app);
-								}
+								convertTiffToPng(file.path, this.app, true);
 							});
 					});
 				}
 			})
 		);
+
+		// Context Menu
+		// Add event listener for contextmenu event on image elements
+		this.registerDomEvent(document, 'contextmenu', (event) => {
+			const embedElement = (event.target as HTMLElement).closest('.internal-embed');
+			if (embedElement) {
+				const filePath = embedElement.getAttribute('src');
+				if (filePath && (filePath.endsWith('.tif') || filePath.endsWith('.tiff'))) {
+					event.preventDefault();
+					new Menu()
+						.addItem((item) => item.setTitle('Convert to PNG')
+							.setIcon('cog')
+							.onClick(async () => {
+
+								// convert image to png
+								await convertTiffToPng(filePath, this.app, true);
+								//get editor
+								const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+								if (activeView) {
+									const editor = activeView.editor;
+									// replace the link with the new png
+									// TODO get line number of clicked element and insert beneath
+									await replaceTiffLink(editor, filePath, null);
+								}
+
+
+							}))
+						.showAtPosition({ x: event.pageX, y: event.pageY });
+				}
+			}
+		});
+
+
 	}
 
 

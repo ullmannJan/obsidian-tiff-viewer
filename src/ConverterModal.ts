@@ -1,6 +1,6 @@
 import { App, Editor, normalizePath } from "obsidian";
 import { SuperModal } from "./SuperModal";
-import { convertTiffDataToPng } from "./Conversion";
+import { convertTiffToPng, replaceTiffLink } from "./Conversion";
 
 
 export class ConverterModal extends SuperModal {
@@ -58,7 +58,7 @@ export class ConverterModal extends SuperModal {
                 const line = lineIndices[index];
 
                 return await new Promise<void>((resolve, reject) => {
-                    this.convertTiffToPng(tiffFilePath, line)
+                    this.convertTiffToPngInEditor(tiffFilePath, line)
                         .then(() => {
                             // console.log('Successfully converted', tiffFile);
                             resolve();
@@ -104,26 +104,14 @@ export class ConverterModal extends SuperModal {
         }
     }
 
-    private async convertTiffToPng(tiffFilePath: string, line: number): Promise<void> {
+    private async convertTiffToPngInEditor(tiffFilePath: string, line: number): Promise<void> {
 
         // find the file in the vault
         const tiffFileInVault = await this.findFileInVault(tiffFilePath)
 
-        // create png file path
-        let pngFilePath = tiffFileInVault.path + '.png';
-
-        // read tiff file
-        const tiffFileData = await this.app.vault.adapter.readBinary(tiffFileInVault.path)
-
-        // convert tiff to png
-        const pngFileData = await convertTiffDataToPng(tiffFileData)
-
-        // create png file
-        ConverterModal.createFile(pngFilePath, pngFileData, this.app);
-
+        convertTiffToPng(tiffFileInVault.path, this.app, false);
         // rename file link in editor
-        const lineContent = this.editor.getLine(line);
-        this.editor.setLine(line, lineContent.replace(tiffFilePath + "]]", pngFilePath + "]]"));
+        replaceTiffLink(this.editor, tiffFilePath, line);
 
     }
 }

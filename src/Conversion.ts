@@ -1,3 +1,7 @@
+import { SuperModal } from "./SuperModal";
+import { ConfirmationModal } from "./ConfirmationModal";
+import { App, Editor } from "obsidian";
+
 const UTIF = require('utif');
 const PNG = require('pngjs').PNG;
 
@@ -31,4 +35,41 @@ export async function convertTiffDataToPng(tiffFileData: ArrayBuffer): Promise<A
 
     // const pngFileData = tiffFileData; // For now, we'll just simulate a conversion by returning the same data
     return pngFileData;
+}
+
+export async function convertTiffToPng(filePath: string, app: App, confirm:boolean = false): Promise<void> {
+    const pngFilePath = filePath + '.png';
+
+    // read tiff file
+    const tiffFileData = await app.vault.adapter.readBinary(filePath);
+    // convert tiff to png
+    const pngFileData = await convertTiffDataToPng(tiffFileData);
+    const fileExists = await app.vault.adapter.exists(pngFilePath);
+    if (fileExists && confirm) {
+        const confirmModal = new ConfirmationModal(app,
+            'Confirmation',
+            `Do you want to overwrite "${pngFilePath}"?`,
+            (confirmed: boolean) => {
+                if (confirmed) {
+                    // create png file
+                    SuperModal.createFile(pngFilePath, pngFileData, this.app, true);
+                }
+            });
+        confirmModal.open();
+    } else {
+        // create png file
+        SuperModal.createFile(pngFilePath, pngFileData, this.app);
+    }
+}
+
+export async function replaceTiffLink(editor: Editor, tiffFilePath: string, line: number|null): Promise<void> {
+    // Replace the tiff link with the png link
+    if (line === null) {
+        const editorValue = editor.getValue();
+        editor.setValue(editorValue.split(tiffFilePath + "]]").join(tiffFilePath + ".png" + "]]"));
+    }else{
+        const lineContent = editor.getLine(line);
+        const lineContentReplaced = lineContent.split(tiffFilePath + "]]").join(tiffFilePath + ".png" + "]]");
+        editor.setLine(line, lineContentReplaced);
+    }
 }
