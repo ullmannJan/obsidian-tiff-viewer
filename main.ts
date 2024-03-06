@@ -157,38 +157,42 @@ export default class TiffViewerPlugin extends Plugin {
 				}
 			})
 		);
+		
+		// I dont like this yet
+		// // add context menu to convert tiff to png by clicking on the file
 
-		// Context Menu
-		// Add event listener for contextmenu event on image elements
-		this.registerDomEvent(document, 'contextmenu', (event) => {
-			const embedElement = (event.target as HTMLElement).closest('.internal-embed');
-			if (embedElement) {
-				const filePath = embedElement.getAttribute('src');
-				if (filePath && (filePath.endsWith('.tif') || filePath.endsWith('.tiff'))) {
-					event.preventDefault();
-					new Menu()
-						.addItem((item) => item.setTitle('Convert to PNG')
-							.setIcon('cog')
-							.onClick(async () => {
+		// this.registerDomEvent(document, 'contextmenu', (event) => {
+		// 	const embedElement = (event.target as HTMLElement).closest('.internal-embed');
+		// 	if (embedElement && embedElement.classList.contains('mod-generic')
+		// 	&& embedElement.classList.contains('file-embed')
+		// 	&& embedElement.classList.contains('internal-embed')
+		// 	&& embedElement.classList.contains('is-loaded')) {
 
-								// convert image to png
-								await convertTiffToPng(filePath, this.app, true);
-								//get editor
-								const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-								if (activeView) {
-									const editor = activeView.editor;
-									// replace the link with the new png
-									// TODO get line number of clicked element and insert beneath
-									await replaceTiffLink(editor, filePath, null);
-								}
+		// 		const filePath = embedElement.getAttribute('src');
+		// 		if (filePath && (filePath.endsWith('.tif') || filePath.endsWith('.tiff'))) {
+		// 			event.preventDefault();
+		// 			new Menu()
+		// 				.addItem((item) => item.setTitle('Convert to PNG')
+		// 					.setIcon('cog')
+		// 					.onClick(async () => {
+
+		// 						// convert image to png
+		// 						await convertTiffToPng(filePath, this.app, true);
+		// 						//get editor
+		// 						const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		// 						if (activeView) {
+		// 							const editor = activeView.editor;
+		// 							// replace the link with the new png
+		// 							// TODO get line number of clicked element and insert beneath
+		// 							await replaceTiffLink(editor, filePath, null);
+		// 						}
 
 
-							}))
-						.showAtPosition({ x: event.pageX, y: event.pageY });
-				}
-			}
-		});
-
+		// 					}))
+		// 				.showAtPosition({ x: event.pageX, y: event.pageY });
+		// 		}
+		// 	}
+		// });
 
 	}
 
