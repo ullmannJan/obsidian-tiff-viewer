@@ -62,14 +62,14 @@ export async function convertTiffToPng(filePath: string, app: App, confirm:boole
     }
 }
 
-export async function replaceTiffLink(editor: Editor, tiffFilePath: string, line: number|null): Promise<void> {
+export async function replaceTiffLink(editor: Editor, tiffFilePath: string, pngFilePath:string, line: number|null): Promise<void> {
     // Replace the tiff link with the png link
     if (line === null) {
         const editorValue = editor.getValue();
-        editor.setValue(editorValue.split(tiffFilePath + "]]").join(tiffFilePath + ".png" + "]]"));
+        editor.setValue(editorValue.split(tiffFilePath + "]]").join(pngFilePath + "]]"));
     }else{
         const lineContent = editor.getLine(line);
-        const lineContentReplaced = lineContent.split(tiffFilePath + "]]").join(tiffFilePath + ".png" + "]]");
+        const lineContentReplaced = lineContent.split(tiffFilePath + "]]").join(pngFilePath + "]]");
         editor.setLine(line, lineContentReplaced);
     }
 }

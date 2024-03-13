@@ -111,7 +111,7 @@ export class ConverterModal extends SuperModal {
 
         convertTiffToPng(tiffFileInVault.path, this.app, false);
         // rename file link in editor
-        replaceTiffLink(this.editor, tiffFilePath, line);
+        replaceTiffLink(this.editor, tiffFilePath, tiffFileInVault.path+".png", line);
 
     }
 }
