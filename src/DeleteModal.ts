@@ -24,13 +24,13 @@ export class DeleteModal extends SuperModal {
     }
 
     private deleteTiffPNGFilesInEditor() {
-        const tiffPngRegex = /!\[\[(.*?\.tif{1,2}\.png)\]\]/gi;
+        const tiffPngRegex = /!\[\[((?:(?!\[\[).)+\.tif{1,2}\.png)\]\]/gi;
         let match;
         let matches: string[] = [];
         let lineIndices: number[] = [];
         let editorValue = this.editor.getValue();
         while ((match = tiffPngRegex.exec(editorValue)) !== null) {
-            matches.push(match[0]);
+            matches.push(match[1]);
             let lineNumber = (editorValue.substring(0, match.index).match(/\n/g) || []).length;
             lineIndices.push(lineNumber);
         }
@@ -40,7 +40,7 @@ export class DeleteModal extends SuperModal {
 
             // console.log('found .tiff.png files', matches, "in lines", lineIndices);
             const conversionPromises = matches.map(async (match, index) => {
-                const tiffPngFile = match.replace('![[', '').replace(']]', '');
+                const tiffPngFile = match//.replace('![[', '').replace(']]', '');
                 const tiffPngFilePath = normalizePath(tiffPngFile);
                 const line = lineIndices[index]; 
                 

@@ -37,13 +37,13 @@ export class ConverterModal extends SuperModal {
 
     private convertTiffFilesToPng() {
 
-        const tiffFileRegex = /!\[\[(.*?\.tif{1,2})\]\]/gi;
+        const tiffFileRegex = /!\[\[((?:(?!\[\[).)+\.tif{1,2})\]\]/gi;
         let match;
         let matches: string[] = [];
         let lineIndices: number[] = [];
         let editorValue = this.editor.getValue();
         while ((match = tiffFileRegex.exec(editorValue)) !== null) {
-            matches.push(match[0]);
+            matches.push(match[1]);
             let lineNumber = (editorValue.substring(0, match.index).match(/\n/g) || []).length;
             lineIndices.push(lineNumber);
         }
@@ -53,7 +53,7 @@ export class ConverterModal extends SuperModal {
 
             // console.log('found tiff files', matches, "in lines", lineIndices);
             const conversionPromises = matches.map(async (match, index) => {
-                const tiffFile = match.replace('![[', '').replace(']]', '');
+                const tiffFile = match;//.replace('![[', '').replace(']]', '');
                 const tiffFilePath = normalizePath(tiffFile);
                 const line = lineIndices[index];
 
